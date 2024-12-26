@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery for AJAX -->
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Your Cart</h2>
+    {% if cart_items %}
+    <ul class="list-group">
+        {% for item in cart_items %}
+        <li class="list-group-item">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img src="{{ item['ImageURL'] }}" class="img-fluid" alt="{{ item['Name'] }}">
+                </div>
+                <div class="col-md-8">
+                    <h5>{{ item['Name'] }}</h5>
+                    <p>Brand: {{ item['Brand'] }}</p>
+                </div>
+                <div class="col-md-2 text-right">
+                    <button class="btn btn-danger btn-sm remove-btn" data-name="{{ item['Name'] }}">Remove</button>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-center">Your cart is empty.</p>
+    {% endif %}
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-primary">Continue Shopping</a>
+    </div>
+</div>
+
+<script>
+    // Function to remove a product from the cart
+    $(document).ready(function () {
+        $('.remove-btn').click(function () {
+            const productName = $(this).data('name');  // Get the product name
+
+            $.ajax({
+                url: '/remove_from_cart',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Name: productName }),
+                success: function (response) {
+                    alert(response.message);  // Show success message
+                    location.reload();  // Reload page to update cart
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseJSON.message);  // Show error message
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
